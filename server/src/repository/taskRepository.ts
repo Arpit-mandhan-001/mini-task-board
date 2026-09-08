@@ -1,5 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { CreateTaskInput, Task, TaskStatus } from '../types/task.ts';
+import { CreateTaskInput, Task, TaskStatus } from '../types/task.js';
 import { pool } from './../config/database';
 
 
@@ -13,7 +13,7 @@ export const findAll = async():Promise<Task[]> => {
 }
 
 // Get Task by Id
-export const findById = async(id: Number):Promise<Task | null> => {
+export const findById = async(id: number):Promise<Task | null> => {
     const [rows] = await pool.query<RowDataPacket[]>(
         'SELECT id, title, status, created_at FROM tasks WHERE id = ?',
         [id]
@@ -22,7 +22,7 @@ export const findById = async(id: Number):Promise<Task | null> => {
 }
 
 // Create a new task in database
-export const create = async(taskInput: CreateTaskInput): Promise<Task> => {
+export const createTask = async(taskInput: CreateTaskInput): Promise<Task> => {
     const status: TaskStatus = taskInput.status || 'todo';
     const [result] = await pool.query<ResultSetHeader>(
       'INSERT INTO tasks (title, status) VALUES (?, ?)',
@@ -54,7 +54,7 @@ export const updateStatus = async(id: number, status: TaskStatus): Promise<Task 
 
 // Update a task's title, status, or both
 // only the field provided by the caller will be updated
-export const update = async(id: number, title?: string, status?: TaskStatus): Promise<Task | null> => {
+export const updateTask = async(id: number, title?: string, status?: TaskStatus): Promise<Task | null> => {
     const updates: string[] = [];
     const values: (string | TaskStatus | number)[] = [];
 
@@ -86,7 +86,7 @@ export const update = async(id: number, title?: string, status?: TaskStatus): Pr
     return await findById(id);
 }
 
-export const Delete = async (id: number): Promise<boolean> => {
+export const deleteTask = async (id: number): Promise<boolean> => {
   const [result] = await pool.query<ResultSetHeader>(
     'DELETE FROM tasks WHERE id = ?',
     [id]
