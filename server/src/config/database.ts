@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const pool = mysql.createPool({
+// Create a connection pool for handling multiple database requests.
+export const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER,
@@ -14,7 +15,8 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-const connectDb = async () => {
+// Checks if the database connection is working when the app starts.
+export const connectDb = async () => {
   try {
     const connection = await pool.getConnection();
 
@@ -28,5 +30,4 @@ const connectDb = async () => {
   }
 };
 
-export { pool };
 export default connectDb;
