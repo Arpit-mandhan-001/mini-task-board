@@ -111,12 +111,12 @@ npm install
 Create or update `server/.env` with your local MySQL settings:
 
 ```env
-PORT=4001
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=mini_task_manager
+PORT=
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
 ```
 
 Use the username and password configured on your own computer. Do not commit real passwords or other secrets to GitHub.
@@ -141,7 +141,7 @@ npm install
 Create or update `frontend/.env`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:4001/api
+NEXT_PUBLIC_API_URL=BACKEND_URL
 ```
 
 Start the frontend:
