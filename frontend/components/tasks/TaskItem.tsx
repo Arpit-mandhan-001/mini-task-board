@@ -56,27 +56,41 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const getStatusIcon = (status: TaskStatus) => {
     switch (status) {
       case 'done':
-        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+        return (
+          <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-200/80">
+            <CheckCircle2 className="w-4 h-4" />
+          </div>
+        );
       case 'in-progress':
-        return <Clock className="w-4 h-4 text-blue-500 animate-pulse" />;
+        return (
+          <div className="p-1.5 bg-teal-50 rounded-lg text-teal-600 border border-teal-200/80">
+            <Clock className="w-4 h-4 animate-pulse" />
+          </div>
+        );
       case 'todo':
       default:
-        return <CircleDashed className="w-4 h-4 text-amber-500" />;
+        return (
+          <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500 border border-slate-200">
+            <CircleDashed className="w-4 h-4" />
+          </div>
+        );
     }
   };
 
   return (
     <div
-      className={`group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 ${
-        task.status === 'done' ? 'opacity-85' : ''
+      className={`group bg-white backdrop-blur border border-slate-200/80 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-teal-sm hover:border-teal-300 ${
+        task.status === 'done' ? 'opacity-75 bg-slate-50/60' : ''
       }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Left column: Icon & Title */}
-        <div className="flex items-start gap-3 flex-1 min-w-0">
+        <div className="flex items-start gap-3.5 flex-1 min-w-0">
           <div className="mt-0.5 flex-shrink-0">
             {isUpdating ? (
-              <Loader2 className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+              <div className="p-1.5 bg-teal-50 rounded-lg border border-teal-200/80">
+                <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
+              </div>
             ) : (
               getStatusIcon(task.status)
             )}
@@ -84,24 +98,24 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
           <div className="flex-1 min-w-0">
             <h3
-              className={`text-sm sm:text-base font-medium break-words transition-all ${
+              className={`text-sm sm:text-base font-semibold leading-snug break-words transition-all ${
                 task.status === 'done'
-                  ? 'line-through text-slate-400 dark:text-slate-500'
-                  : 'text-slate-800 dark:text-slate-100'
+                  ? 'line-through text-slate-400 font-normal'
+                  : 'text-slate-900'
               }`}
             >
               {task.title}
             </h3>
 
-            <div className="flex items-center gap-2 mt-1.5 text-xs text-slate-400 dark:text-slate-500">
-              <Calendar className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2 mt-1 text-xs text-slate-400 font-medium">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
               <span>Created {formatDate(task.created_at)}</span>
             </div>
           </div>
         </div>
 
         {/* Right column: Status Selector & Delete Action */}
-        <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
+        <div className="flex items-center justify-between sm:justify-end gap-3 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100">
           <TaskStatusSelect
             value={task.status}
             onChange={handleStatusUpdate}
@@ -113,7 +127,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             onClick={handleDelete}
             disabled={isDeleting || isUpdating}
             title="Delete task"
-            className="p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDeleting ? (
               <Loader2 className="w-4 h-4 animate-spin text-red-500" />

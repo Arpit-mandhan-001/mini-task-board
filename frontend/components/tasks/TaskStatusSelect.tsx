@@ -16,26 +16,24 @@ export const statusConfig: Record<
 > = {
   todo: {
     label: "To Do",
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-    text: "text-amber-700 dark:text-amber-400",
-    border: "border-amber-200 dark:border-amber-800/50",
-    badgeBg:
-      "bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300",
+    bg: "bg-slate-100/90",
+    text: "text-slate-700",
+    border: "border-slate-200/90",
+    badgeBg: "bg-slate-100 text-slate-700",
   },
   "in-progress": {
     label: "In Progress",
-    bg: "bg-blue-50 dark:bg-blue-950/30",
-    text: "text-blue-700 dark:text-blue-400",
-    border: "border-blue-200 dark:border-blue-800/50",
-    badgeBg: "bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300",
+    bg: "bg-teal-50",
+    text: "text-teal-800",
+    border: "border-teal-200/90",
+    badgeBg: "bg-teal-100/80 text-teal-800",
   },
   done: {
     label: "Done",
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-    text: "text-emerald-700 dark:text-emerald-400",
-    border: "border-emerald-200 dark:border-emerald-800/50",
-    badgeBg:
-      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300",
+    bg: "bg-emerald-50",
+    text: "text-emerald-800",
+    border: "border-emerald-200/90",
+    badgeBg: "bg-emerald-100/80 text-emerald-800",
   },
 };
 
@@ -48,19 +46,27 @@ export const TaskStatusSelect: React.FC<TaskStatusSelectProps> = ({
   const currentConfig = statusConfig[value];
 
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as TaskStatus)}
-      disabled={disabled}
-      className={`font-medium rounded-lg transition-colors border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${
-        currentConfig.bg
-      } ${currentConfig.text} ${currentConfig.border} ${
-        size === "sm" ? "px-2.5 py-1 text-xs" : "px-3 py-2 text-sm"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}
-    >
-      <option value="todo">📋 To Do</option>
-      <option value="in-progress">⏳ In Progress</option>
-      <option value="done">✅ Done</option>
-    </select>
+    <div className="relative inline-block">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as TaskStatus)}
+        disabled={disabled}
+        className={`font-semibold rounded-xl transition-all border cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/30 ${
+          currentConfig.bg
+        } ${currentConfig.text} ${currentConfig.border} ${
+          size === "sm" ? "px-3 py-1.5 text-xs" : "px-3.5 py-2 text-sm"
+        } ${disabled ? "opacity-50 cursor-not-allowed" : "hover:shadow-xs"}`}
+      >
+        <option value="todo" className="bg-white text-slate-800">
+          📋 To Do
+        </option>
+        <option value="in-progress" className="bg-white text-slate-800">
+          ⚡ In Progress
+        </option>
+        <option value="done" className="bg-white text-slate-800">
+          ✓ Done
+        </option>
+      </select>
+    </div>
   );
 };
