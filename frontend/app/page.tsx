@@ -1,8 +1,11 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { CreateTaskInput, Task, TaskStatus } from "../../types/task";
-import { CheckSquare, RefreshCw, AlertTriangle, Layers } from "lucide-react";
+import React, { useEffect, useState, useCallback } from 'react';
+import { CreateTaskInput, Task, TaskStatus } from '../types/task';
+import { taskService } from '../services/taskService';
+import { TaskForm } from '../components/tasks/TaskForm';
+import { TaskList } from '../components/tasks/TaskList';
+import { CheckSquare, RefreshCw, AlertTriangle, Layers } from 'lucide-react';
 
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -10,13 +13,82 @@ export default function HomePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch all tasks from backend
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await taskService.getTasks();
+      setTasks(data);
+    } catch (err: any) {
+      setError(
+        err.message || 'Failed to connect to backend server. Make sure Express & MySQL are running.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
+  // Handle task addition with optimistic update
+  const handleAddTask = async (input: CreateTaskInput) => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const newTask = await taskService.createTask(input);
+      setTasks((prev) => [newTask, ...prev]);
+    } catch (err: any) {
+      setError(err.message || 'Failed to create task');
+      throw err;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle status change with optimistic UI update
+  const handleStatusChange = async (id: number, newStatus: TaskStatus) => {
+    const previousTasks = [...tasks];
+    
+    // Optimistically update local state
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, status: newStatus } : task
+      )
+    );
+
+    try {
+      await taskService.updateTaskStatus(id, newStatus);
+    } catch (err: any) {
+      // Rollback on error
+      setTasks(previousTasks);
+      setError(err.message || 'Failed to update task status');
+    }
+  };
+
+  // Handle task deletion with optimistic UI update
+  const handleDeleteTask = async (id: number) => {
+    const previousTasks = [...tasks];
+
+    // Optimistically remove from state
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+
+    try {
+      await taskService.deleteTask(id);
+    } catch (err: any) {
+      // Rollback on error
+      setTasks(previousTasks);
+      setError(err.message || 'Failed to delete task');
+    }
+  };
+
   // Calculate task summary counts
   const totalTasks = tasks.length;
-  const todoCount = tasks.filter((t) => t.status === "todo").length;
-  const inProgressCount = tasks.filter(
-    (t) => t.status === "in-progress",
-  ).length;
-  const doneCount = tasks.filter((t) => t.status === "done").length;
+  const todoCount = tasks.filter((t) => t.status === 'todo').length;
+  const inProgressCount = tasks.filter((t) => t.status === 'in-progress').length;
+  const doneCount = tasks.filter((t) => t.status === 'done').length;
 
   return (
     <main className="flex-1 bg-slate-50 dark:bg-slate-950 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
@@ -40,14 +112,12 @@ export default function HomePage() {
           </div>
 
           <button
-            // onClick={loadTasks}
+            onClick={loadTasks}
             disabled={isLoading}
             className="self-start sm:self-auto px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all flex items-center gap-2 disabled:opacity-50"
             title="Refresh tasks"
           >
-            <RefreshCw
-              className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </button>
         </header>
@@ -59,9 +129,7 @@ export default function HomePage() {
               <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-semibold">Error Occurred</h3>
-                <p className="text-xs text-red-700 dark:text-red-400 mt-0.5">
-                  {error}
-                </p>
+                <p className="text-xs text-red-700 dark:text-red-400 mt-0.5">{error}</p>
               </div>
             </div>
             <button
@@ -80,12 +148,8 @@ export default function HomePage() {
               <Layers className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {totalTasks}
-              </div>
-              <div className="text-[11px] text-slate-500 font-medium">
-                Total Tasks
-              </div>
+              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{totalTasks}</div>
+              <div className="text-[11px] text-slate-500 font-medium">Total Tasks</div>
             </div>
           </div>
 
@@ -94,12 +158,8 @@ export default function HomePage() {
               <span className="text-xs font-bold">📋</span>
             </div>
             <div>
-              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {todoCount}
-              </div>
-              <div className="text-[11px] text-slate-500 font-medium">
-                To Do
-              </div>
+              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{todoCount}</div>
+              <div className="text-[11px] text-slate-500 font-medium">To Do</div>
             </div>
           </div>
 
@@ -108,12 +168,8 @@ export default function HomePage() {
               <span className="text-xs font-bold">⏳</span>
             </div>
             <div>
-              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {inProgressCount}
-              </div>
-              <div className="text-[11px] text-slate-500 font-medium">
-                In Progress
-              </div>
+              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{inProgressCount}</div>
+              <div className="text-[11px] text-slate-500 font-medium">In Progress</div>
             </div>
           </div>
 
@@ -122,25 +178,23 @@ export default function HomePage() {
               <span className="text-xs font-bold">✅</span>
             </div>
             <div>
-              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {doneCount}
-              </div>
+              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{doneCount}</div>
               <div className="text-[11px] text-slate-500 font-medium">Done</div>
             </div>
           </div>
         </div>
 
         {/* Task Creation Form */}
-        {/* <TaskForm onAddTask={handleAddTask} isSubmitting={isSubmitting} /> */}
+        <TaskForm onAddTask={handleAddTask} isSubmitting={isSubmitting} />
 
         {/* Task List Section */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm">
-          {/* <TaskList
+          <TaskList
             tasks={tasks}
             isLoading={isLoading}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteTask}
-          /> */}
+          />
         </div>
       </div>
     </main>
