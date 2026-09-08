@@ -39,6 +39,10 @@ The project was built as an assignment to demonstrate a frontend, REST API, data
 - `dotenv` for environment variables
 - `cors` for frontend-to-backend requests
 
+#### why i choose Nodejs and Expressjs?
+ * becuase i want separate Express.js server running on Node.js rather than Next.js API routes.
+ This keeps the backend API independent from the frontend and makes the API structure, routes, and server-side logic easier to manage separately.
+
 ### Database
 
 - MySQL
